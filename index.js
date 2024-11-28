@@ -227,6 +227,31 @@ app.put("/api/edittodo/:id", auth, async function (req, res) {
   }
 });
 
+app.patch("/api/done/:id", auth, async function (req, res) {
+  const todoId = req.params.id;
+
+  try {
+    const todo = await todoModel.findOne({ _id: todoId, userId: req.userId });
+    if (!todo) {
+      return res.status(404).json({
+        message: "Not found todo or Not have the permission",
+      });
+    }
+
+    todo.complete = true;
+    await todo.save();
+
+    res.json({
+      todo: todo,
+      message: "Todo has updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error!!",
+    });
+  }
+});
+
 app.delete("/api/deletetodo/:id", auth, async function (req, res) {
   const todoId = req.params.id;
   try {
