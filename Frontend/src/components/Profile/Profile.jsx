@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { logout } from "../../Redux/Slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const Profile = () => {
   const [userData, setUserData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -17,23 +20,20 @@ const Profile = () => {
           return;
         }
 
-        // console.log("Token being sent:", token);
-
         const response = await axios.get("http://localhost:3000/api/me", {
           headers: {
-            token: token, 
+            token: token,
           },
           withCredentials: true,
         });
 
-        // console.log("User data:", response.data);
         setUserData(response.data);
       } catch (error) {
         console.error(
           "Error fetching user data:",
           error.response?.data || error.message
         );
-        navigate("/"); 
+        navigate("/");
       } finally {
         setLoading(false);
       }
@@ -42,22 +42,59 @@ const Profile = () => {
     fetchUserData();
   }, [navigate]);
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500 text-lg">Loading profile...</p>
+      <div className="flex justify-center items-center h-screen dark:bg-gray-900 dark:text-white">
+        <p className="text-gray-500 dark:text-gray-300 text-lg">
+          Loading profile...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Profile</h2>
-      <div className="mb-4">
-        <label className="block text-gray-600 font-medium">Username</label>
-        <p className="px-3 py-2 bg-gray-100 rounded-lg text-gray-700">
-          {userData.username}
-        </p>
+    <div className="dark:bg-[#232222] h-[90.8vh] w-screen overflow-hidden  ">
+      <div className="max-w-xs mx-auto p-6 dark:bg-[#82858a] bg-gray-800 shadow-lg rounded-lg mt-10 transition-colors">
+        <h2 className="text-2xl text-center font-semibold dark:text-[#E5E7EB] text-gray-200 mb-4">
+          Profile
+        </h2>
+        <div className="mb-3">
+          <label className="mb-1 block dark:text-[#E5E7EB] text-gray-300 font-medium">
+            Username
+          </label>
+          <p className="px-3 py-2 dark:bg-[#F9FAFB] bg-gray-700 rounded-lg  dark:text-gray-700 text-gray-200">
+            {userData.username}
+          </p>
+        </div>
+        <div className="mb-3">
+          <label className="mb-1 block dark:text-[#E5E7EB] text-gray-300 font-medium">
+            Email
+          </label>
+          <p className="px-3 py-2 dark:bg-[#F9FAFB] bg-gray-700 rounded-lg  dark:text-gray-700 text-gray-200">
+            {userData.username}
+          </p>
+        </div>
+        <div className="mb-3">
+          <label className="mb-1 block dark:text-[#E5E7EB] text-gray-300 font-medium">
+            Age
+          </label>
+          <p className="px-3 py-2 dark:bg-[#F9FAFB] bg-gray-700 rounded-lg  dark:text-gray-700 text-gray-200">
+            {userData.username}
+          </p>
+        </div>
+        <div className=" flex items-center justify-center">
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 dark:bg-red-500 mt-2 px-4 py-2 rounded-lg text-white dark:text-gray-100 font-medium transition-colors hover:bg-red-700 dark:hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );

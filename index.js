@@ -54,7 +54,7 @@ function auth(req, res, next) {
 
 app.post("/api/signup", async function (req, res) {
   const requiredBody = z.object({
-    username: z.string().min(5).max(35).includes("@"),
+    username: z.string().min(5).max(35),
     password: z
       .string()
       .min(5)
@@ -105,9 +105,7 @@ app.post("/api/signin", async function (req, res) {
       return res.status(403).json({ message: "Invalid username or password" });
     }
 
-    const token = jwt.sign({ id: user._id.toString() }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: user._id.toString() }, JWT_SECRET);
     res.json({ token });
   } catch (error) {
     console.error("Signin error:", error.message);

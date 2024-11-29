@@ -4,7 +4,8 @@ import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home/Home";
 import Profile from "./components/Profile/Profile";
 import ShowTodos from "./components/Todos/ShowTodos";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/Protected-route/ProtectedRoute";
+import Reports from "./components/Reports/Reports";
 
 function App() {
   return (
@@ -25,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ShowTodos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
             </ProtectedRoute>
           }
         />
