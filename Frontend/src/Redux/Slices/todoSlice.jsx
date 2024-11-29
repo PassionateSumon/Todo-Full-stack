@@ -1,4 +1,3 @@
-// src/Slices/todoSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -36,7 +35,7 @@ export const addTodo = createAsyncThunk(
       return thunkApi.rejectWithValue(error.response.data);
     }
   }
-);
+); // add the todo
 
 export const editTodo = createAsyncThunk(
   "todos/editTodo",
@@ -55,7 +54,7 @@ export const editTodo = createAsyncThunk(
       return thunkApi.rejectWithValue(error.response.data);
     }
   }
-);
+); // edit the todo
 
 export const deleteTodo = createAsyncThunk(
   "todos/deleteTodo",
@@ -67,10 +66,29 @@ export const deleteTodo = createAsyncThunk(
       });
       return id;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data);
+      return thunkApi.rejectWithValue(error.response?.data);
     }
   }
-);
+); // delete the todo
+
+export const comepleteTodo = createAsyncThunk(
+  "todos/completeTodo",
+  async (id, thunkApi) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.patch(
+        `${BASE_API}/donetodo/${id}`,
+        {},
+        {
+          headers: { token },
+        }
+      );
+      return response.data?.todo;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.response?.data);
+    }
+  }
+); // mark done/undone todo
 
 const initialState = {
   todos: [],
@@ -91,7 +109,7 @@ const todoSlice = createSlice({
         state.todos.push(action.payload);
       })
       .addCase(editTodo.fulfilled, (state, action) => {
-        const ind = state.todos.findIndex((t) => t.id === action.payload.id);
+        const ind = state.todos.findIndex((t) => t._id === action.payload.id);
         if (ind !== -1) {
           state.todos[ind] = {
             ...state.todos[ind],
@@ -100,13 +118,20 @@ const todoSlice = createSlice({
         }
       })
       .addCase(deleteTodo.fulfilled, (state, action) => {
-        state.todos = state.todos.filter((t) => t.id !== action.payload);
+        state.todos = state.todos.filter((t) => t._id !== action.payload);
+      })
+      .addCase(comepleteTodo.fulfilled, (state, action) => {
+        const todo = state.todos.find((t) => t._id === action.payload.id);
+        if (todo) {
+          todo.completed = action.payload.complete;
+        }
       })
       .addCase(
         fetchTodos.rejected,
         addTodo.rejected,
         editTodo.rejected,
         deleteTodo.rejected,
+        comepleteTodo.rejected,
         (state, action) => {
           state.status = "failed";
           state.error = action.payload;

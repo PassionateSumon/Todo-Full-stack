@@ -13,8 +13,8 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    origin: "http://localhost:5173", // Replace with frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization", "token"], // Include custom 'token' header
     credentials: true, // Enable cookies or other credentials
   })
@@ -22,10 +22,7 @@ app.use(
 app.options("*", cors());
 
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected with DB"))
   .catch((e) => console.error("Database error: ", e));
 
@@ -238,7 +235,7 @@ app.patch("/api/done/:id", auth, async function (req, res) {
       });
     }
 
-    todo.complete = true;
+    todo.complete = !todo.complete;
     await todo.save();
 
     res.json({
